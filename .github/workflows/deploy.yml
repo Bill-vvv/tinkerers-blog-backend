@@ -1,0 +1,36 @@
+name: Deploy Backend to Tencent Cloud
+
+# 触发条件：当有代码 push 到 main 分支时
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    # 运行环境：使用最新的 Ubuntu 虚拟服务器
+    runs-on: ubuntu-latest
+
+    steps:
+      # 第一步：检出（下载）你的仓库代码到虚拟环境中
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 第二步：通过 SSH 连接到你的服务器并执行部署脚本
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22 # SSH 默认端口
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+          script: |
+            echo "🚀 Starting deployment..."
+            cd /root/tinkerers-blog-backend # 确保这是你服务器上后端项目的正确路径
+            echo "➡️ Pulling latest code from main branch..."
+            git pull origin main
+            echo "📦 Installing dependencies..."
+            npm install
+            echo "🔄 Reloading application with PM2..."
+            pm2 reload blog-backend || pm2 start server.js --name "blog-backend"
+            echo "✅ Deployment finished successfully!"
