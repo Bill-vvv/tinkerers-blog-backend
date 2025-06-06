@@ -23,7 +23,6 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22 # SSH 默认端口
-          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           script: |
             echo "🚀 Starting deployment..."
             cd /root/tinkerers-blog-backend # 确保这是你服务器上后端项目的正确路径
